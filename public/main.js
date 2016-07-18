@@ -6,7 +6,6 @@ $.ajax({
     method: "GET",
     success: function(response) {
          for(var i=0; i < response.contents.length; i++) {
-
             var li = document.createElement("LI");
             var a = document.createElement("A");
             var t = document.createTextNode(response.filearr[i]);
@@ -14,12 +13,19 @@ $.ajax({
             a.appendChild(t);
             li.appendChild(a);
 
-            li.id = "tab" + i;
+            li.id = "" + i;
 
             if(i==0)
                 li.className = "active";
 
             document.getElementById("tabs").appendChild(li);
+
+            $(li).click(function(e) {
+                $("li").removeClass("active");
+                $(this).addClass("active");
+
+                $("#notepad").val(contents[parseInt($(this).attr("id"))]);
+            });
         }
 
         contents = response.contents;
@@ -27,10 +33,6 @@ $.ajax({
 
         $("#notepad").val(response.contents[0]);
     }
-});
-
-$("li").click(function(e) {
-    alert("asdf");
 });
 
 $(".active").click(function(e) {});
