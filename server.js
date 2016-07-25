@@ -63,30 +63,81 @@ app.post("/users", function(req, res) {
 
 app.post("/note", function(req, res) {
     var content = req.body.content;
-    var filename;
+    var filename = req.body.filename;
+    var dirname;
 
     for(var i=0; i<3; i++) {
         if(req.session.auth_token == users[i].auth_token) {
-            filename = "user" + i + ".txt";
+            dirname = "user" + i + "/";
             break;
         }
     }
+
     if(i==3)
         console.log("no session for writing file");
 
-    fs.writeFile("notes/" + filename, content, function(err) {
-        if(err) {
+    else if(req.body.action == "delete") {
+        fs.unlink("notes/" + dirname + filename, function(err) {
+            if(err) {
+                res.setHeader('Content-Type', 'application/json');
+                res.send(JSON.stringify({
+                    status: "failure"
+                }));
+            }
             res.setHeader('Content-Type', 'application/json');
             res.send(JSON.stringify({
-                status: "failure"
+                status: "success"
             }));
-        }
+        });
+    }
 
-        res.setHeader('Content-Type', 'application/json');
-        res.send(JSON.stringify({
-            status: "success"
-        }));
-    });
+    else if(req.body.action == "save") {
+        fs.writeFile("notes/" + dirname + filename, content, function(err) {
+            if(err) {
+                res.setHeader('Content-Type', 'application/json');
+                res.send(JSON.stringify({
+                    status: "failure"
+                }));
+            }
+            res.setHeader('Content-Type', 'application/json');
+            res.send(JSON.stringify({
+                status: "success"
+            }));
+        });
+    }
+
+    else if(req.body.action == "new") {
+        fs.writeFile("notes/" + dirname + filename, "", function(err) {
+            if(err) {
+                res.setHeader('Content-Type', 'application/json');
+                res.send(JSON.stringify({
+                    status: "failure"
+                }));
+            }
+            res.setHeader('Content-Type', 'application/json');
+            res.send(JSON.stringify({
+                status: "success"
+            }));
+        });
+    }
+
+    else if(req.body.action == "rename") {
+        fs.rename("notes/" + dirname + filename, "notes/" + dirname + req.body.newname + ".txt", function(err) {
+            if(err) {
+                console.log(err);
+                res.setHeader('Content-Type', 'application/json');
+                res.send(JSON.stringify({
+                    status: "failure"
+                }));
+            }
+            else {
+                res.setHeader('Content-Type', 'application/json');
+                res.send(JSON.stringify({
+                    status: "success"
+                }));
+            }
+        });
+    }
 });
 
 app.get("/note", function(req, res) {

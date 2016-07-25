@@ -35,22 +35,80 @@ $.ajax({
     }
 });
 
-$(".active").click(function(e) {});
-
-$(".btn.btn-default").click(function(e) {
-    e.preventDefault();
-    var content = $("#notepad").val();
+$("#new").click(function(e) {
+    var filename = prompt("Enter the name of new file without .txt", "example");
     $.ajax({
         url: "/note",
         method: "POST",
         data: {
-            content: content
+            action: "new",
+            filename: filename + ".txt"
         },
         success: function(response) {
             if(response.status == "success") {
-                alert("노트가 성공적으로 저장되었습니다.");
+                alert(filearr[num] + " is created successfully");
             } else {
-                alert("노트 저장이 실패했습니다.");
+                alert(filearr[num] + " failed to create")
+            }
+        }
+    });
+});
+
+$("#delete").click(function(e) {
+    var num = parseInt($(".active").attr("id"));
+    $.ajax({
+        url: "/note",
+        method: "POST",
+        data: {
+            action: "delete",
+            filename: filearr[num]
+        },
+        success: function(response) {
+            if(response.status == "success") {
+                alert(filearr[num] + " is deleted successfully");
+            } else {
+                alert(filearr[num] + " failed to delete")
+            }
+        }
+    });
+});
+
+$("#save").click(function(e) {
+    var num = parseInt($(".active").attr("id"));
+    $.ajax({
+        url: "/note",
+        method: "POST",
+        data: {
+            action: "save",
+            filename: filearr[num],
+            content: $("#notepad").val()
+        },
+        success: function(response) {
+            if(response.status == "success") {
+                alert(filearr[num] + " is saved successfully");
+            } else {
+                alert(filearr[num] + " failed to save")
+            }
+        }
+    });
+});
+
+$("#rename").click(function(e) {
+    var num = parseInt($(".active").attr("id"));
+    var newname = prompt("Enter the new name without .txt", "example");
+    $.ajax({
+        url: "/note",
+        method: "POST",
+        data: {
+            action: "rename",
+            filename: filearr[num],
+            newname: newname
+        },
+        success: function(response) {
+            if(response.status == "success") {
+                alert(filearr[num] + " is renamed successfully");
+            } else {
+                alert(filearr[num] + " failed to rename")
             }
         }
     });
